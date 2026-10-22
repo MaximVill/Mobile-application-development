@@ -1,3 +1,17 @@
 <resources>
-    <string name="app_name">Mobile application development</string>
+    <string name="app_name">ArtSpaceApp</string>
+    <string name="previous">Previous</string>
+    <string name="next">Next</string>
+
+    <string name="title_1">Red Square</string>
+    <string name="artist_1">Kazimir Malevich</string>
+    <string name="year_1">1915</string>
+
+    <string name="title_2">Green Circle</string>
+    <string name="artist_2">Wassily Kandinsky</string>
+    <string name="year_2">1923</string>
+
+    <string name="title_3">Blue Triangle</string>
+    <string name="artist_3">Piet Mondrian</string>
+    <string name="year_3">1920</string>
 </resources>
