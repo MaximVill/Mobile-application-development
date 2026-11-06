@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -23,6 +22,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mobileapplicationdevelopment.ui.ArtSpaceUiState
+import com.example.mobileapplicationdevelopment.ui.ArtSpaceViewModel
 import com.example.mobileapplicationdevelopment.ui.theme.MobileApplicationDevelopmentTheme
 
 class MainActivity : ComponentActivity() {
@@ -32,41 +34,41 @@ class MainActivity : ComponentActivity() {
         setContent {
             MobileApplicationDevelopmentTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    ArtSpaceScreen(modifier = Modifier.padding(innerPadding))
+                    ArtSpaceApp(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
     }
 }
 
+/**
+ * Точка входа приложения Art Space, связывающая ViewModel и UI с помощью паттерна UDF.
+ */
 @Composable
-fun ArtSpaceScreen(modifier: Modifier = Modifier) {
-    var currentStep by remember { mutableIntStateOf(1) }
+fun ArtSpaceApp(
+    modifier: Modifier = Modifier,
+    viewModel: ArtSpaceViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
 
-    val imageRes = when (currentStep) {
-        1 -> R.drawable.ic_art_1
-        2 -> R.drawable.ic_art_2
-        else -> R.drawable.ic_art_3
-    }
+    ArtSpaceScreen(
+        uiState = uiState,
+        onPreviousClick = { viewModel.previousArtwork() },
+        onNextClick = { viewModel.nextArtwork() },
+        modifier = modifier
+    )
+}
 
-    val titleRes = when (currentStep) {
-        1 -> R.string.title_1
-        2 -> R.string.title_2
-        else -> R.string.title_3
-    }
-
-    val artistRes = when (currentStep) {
-        1 -> R.string.artist_1
-        2 -> R.string.artist_2
-        else -> R.string.artist_3
-    }
-
-    val yearRes = when (currentStep) {
-        1 -> R.string.year_1
-        2 -> R.string.year_2
-        else -> R.string.year_3
-    }
-
+/**
+ * Stateless Composable-компонент экрана Art Space.
+ */
+@Composable
+fun ArtSpaceScreen(
+    uiState: ArtSpaceUiState,
+    onPreviousClick: () -> Unit,
+    onNextClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
@@ -84,7 +86,7 @@ fun ArtSpaceScreen(modifier: Modifier = Modifier) {
                     .fillMaxHeight()
                     .padding(16.dp)
             ) {
-                ArtworkDisplay(imageRes)
+                ArtworkDisplay(uiState.imageRes)
             }
             Column(
                 modifier = Modifier
@@ -94,15 +96,15 @@ fun ArtSpaceScreen(modifier: Modifier = Modifier) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                ArtworkDescriptor(titleRes, artistRes, yearRes)
+                ArtworkDescriptor(
+                    titleRes = uiState.titleRes,
+                    artistRes = uiState.artistRes,
+                    yearRes = uiState.yearRes
+                )
                 Spacer(modifier = Modifier.height(24.dp))
                 DisplayController(
-                    onPreviousClick = {
-                        if (currentStep > 1) currentStep-- else currentStep = 3
-                    },
-                    onNextClick = {
-                        if (currentStep < 3) currentStep++ else currentStep = 1
-                    }
+                    onPreviousClick = onPreviousClick,
+                    onNextClick = onNextClick
                 )
             }
         }
@@ -115,17 +117,17 @@ fun ArtSpaceScreen(modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            ArtworkDisplay(imageRes)
+            ArtworkDisplay(uiState.imageRes)
             Spacer(modifier = Modifier.height(32.dp))
-            ArtworkDescriptor(titleRes, artistRes, yearRes)
+            ArtworkDescriptor(
+                titleRes = uiState.titleRes,
+                artistRes = uiState.artistRes,
+                yearRes = uiState.yearRes
+            )
             Spacer(modifier = Modifier.height(32.dp))
             DisplayController(
-                onPreviousClick = {
-                    if (currentStep > 1) currentStep-- else currentStep = 3
-                },
-                onNextClick = {
-                    if (currentStep < 3) currentStep++ else currentStep = 1
-                }
+                onPreviousClick = onPreviousClick,
+                onNextClick = onNextClick
             )
         }
     }
@@ -214,6 +216,10 @@ fun DisplayController(
 @Composable
 fun ArtSpacePreview() {
     MobileApplicationDevelopmentTheme {
-        ArtSpaceScreen()
+        ArtSpaceScreen(
+            uiState = ArtSpaceUiState(),
+            onPreviousClick = {},
+            onNextClick = {}
+        )
     }
 }
