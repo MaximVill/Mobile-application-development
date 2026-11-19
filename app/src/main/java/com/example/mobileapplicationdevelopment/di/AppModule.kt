@@ -6,7 +6,7 @@ import com.example.mobileapplicationdevelopment.data.repository.CharacterReposit
 import com.example.mobileapplicationdevelopment.ui.characters.CharactersViewModel
 import com.example.mobileapplicationdevelopment.ui.characterdetail.CharacterDetailViewModel
 import kotlinx.serialization.json.Json
-import okhttp.MediaType.Companion.toMediaType
+import okhttp3.MediaType.Companion.toMediaType
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
