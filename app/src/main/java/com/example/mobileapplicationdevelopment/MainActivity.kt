@@ -7,10 +7,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.mobileapplicationdevelopment.ui.characterdetail.CharacterDetailScreen
+import com.example.mobileapplicationdevelopment.ui.characters.CharactersScreen
 import com.example.mobileapplicationdevelopment.ui.theme.MobileApplicationDevelopmentTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,10 +25,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MobileApplicationDevelopmentTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    RickAndMortyApp(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
@@ -31,17 +33,27 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun RickAndMortyApp(modifier: Modifier = Modifier) {
+    val navController = rememberNavController()
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MobileApplicationDevelopmentTheme {
-        Greeting("Android")
+    NavHost(
+        navController = navController,
+        startDestination = "characters",
+        modifier = modifier
+    ) {
+        composable("characters") {
+            CharactersScreen(
+                onCharacterClick = { characterId ->
+                    navController.navigate("characterDetail/$characterId")
+                }
+            )
+        }
+        composable(
+            route = "characterDetail/{characterId}",
+            arguments = listOf(navArgument("characterId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val characterId = backStackEntry.arguments?.getInt("characterId") ?: return@composable
+            CharacterDetailScreen(characterId = characterId)
+        }
     }
 }
